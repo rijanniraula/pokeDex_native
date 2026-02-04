@@ -8,7 +8,6 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import "./app.css";
 
 interface Pokemon {
   name: string;
