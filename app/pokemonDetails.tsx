@@ -93,49 +93,28 @@ export default function PokemonDetails() {
         }}
       >
         <View
+          className="flex-1 pt-2"
           style={{
-            ...styles.container,
             backgroundColor:
               // @ts-ignore
               bgColorByType[pokemon?.types[0].type.name] || "#fff",
           }}
         >
-          <View style={{ padding: 16 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                // alignItems: "center",
-                gap: 12,
-              }}
-            >
-              <Pressable onPress={() => router.back()} style={{ marginTop: 4 }}>
+          <View className="p-4">
+            <View className="flex-row gap-3">
+              <Pressable onPress={() => router.back()} className="mt-1">
                 <Ionicons name="arrow-back" size={28} color="white" />
               </Pressable>
               <View>
-                <Text
-                  style={{
-                    fontSize: 32,
-                    fontWeight: "bold",
-                    textTransform: "capitalize",
-                    color: "white",
-                  }}
-                >
+                <Text className="text-[32px] font-bold capitalize text-white">
                   {pokemon?.name}
                 </Text>
-                <View style={{ flexDirection: "row", gap: 8 }}>
+                <View className="flex-row gap-2">
                   {pokemon?.types.map((type) => (
                     <Text
                       key={type.type.name}
-                      style={{
-                        textTransform: "capitalize",
-                        backgroundColor: "#ffffff",
-                        color: bgColorByType[type.type.name],
-                        fontWeight: "bold",
-                        paddingVertical: 8,
-                        paddingHorizontal: 16,
-                        borderRadius: 32,
-                        marginTop: 8,
-                      }}
+                      className="capitalize bg-white font-bold py-2 px-4 rounded-[32px] mt-2"
+                      style={{ color: bgColorByType[type.type.name] }}
                     >
                       {type.type.name}
                     </Text>
@@ -145,38 +124,50 @@ export default function PokemonDetails() {
             </View>
           </View>
 
-          <View style={styles.imageContainer}>
+          <View className="w-full justify-center items-center z-50 relative">
             <Image
               source={{
                 uri: "https://icons.veryicon.com/png/128/object/material-design-icons-1/pokeball-1.png",
               }}
-              style={styles.pokeballBgImage}
+              className="absolute top-0 right-0 z-0 opacity-20"
               width={200}
               height={200}
             />
             <Image
               source={{ uri: pokemon?.image }}
-              style={styles.pokemonImage}
+              className="w-[400px] h-[400px] object-contain -mb-[100px]"
+              style={
+                { zIndex: 100, filter: "brightness(1.1) contrast(1.2)" } as any
+              }
             />
           </View>
-          <View style={styles.pokemonDetailsCard}>
-            <View style={styles.detailsContainer}>
-              <Text style={styles.sectionTitle}>About</Text>
-              <View style={styles.statRow}>
-                <Text style={styles.statName}>Height</Text>
-                <Text style={styles.statValue}>{pokemon?.height}</Text>
+          <View className="w-full h-[150%] p-8 bg-white rounded-[50px]">
+            <View className="my-4">
+              <Text className="text-2xl font-bold mb-2">About</Text>
+              <View className="flex-row justify-between py-1">
+                <Text className="capitalize font-light text-base text-[#262525]">
+                  Height
+                </Text>
+                <Text className="font-bold text-base">{pokemon?.height}</Text>
               </View>
-              <View style={styles.statRow}>
-                <Text style={styles.statName}>Weight</Text>
-                <Text style={styles.statValue}>{pokemon?.weight}</Text>
+              <View className="flex-row justify-between py-1">
+                <Text className="capitalize font-light text-base text-[#262525]">
+                  Weight
+                </Text>
+                <Text className="font-bold text-base">{pokemon?.weight}</Text>
               </View>
             </View>
 
-            <Text style={styles.sectionTitle}>Stats</Text>
+            <Text className="text-2xl font-bold mb-2">Stats</Text>
             {pokemon?.stats.map((stat) => (
-              <View key={stat.stat.name} style={styles.statRow}>
-                <Text style={styles.statName}>{stat.stat.name}</Text>
-                <Text style={styles.statValue}>{stat.base_stat}</Text>
+              <View
+                key={stat.stat.name}
+                className="flex-row justify-between py-1"
+              >
+                <Text className="capitalize font-light text-base text-[#262525]">
+                  {stat.stat.name}
+                </Text>
+                <Text className="font-bold text-base">{stat.base_stat}</Text>
               </View>
             ))}
           </View>
@@ -185,68 +176,3 @@ export default function PokemonDetails() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 8,
-  },
-  pokeballBgImage: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    zIndex: 0,
-    opacity: 0.2,
-  },
-  imageContainer: {
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 100,
-    position: "relative",
-  },
-  pokemonImage: {
-    width: 400,
-    height: 400,
-    resizeMode: "contain",
-    filter: "brightness(1.1) contrast(1.2)",
-    marginBottom: -100,
-  },
-  pokemonDetailsCard: {
-    width: "100%",
-    height: "150%",
-    padding: 32,
-    backgroundColor: "#fff",
-    borderRadius: 50,
-    zIndex: 50,
-  },
-  detailsContainer: {
-    marginVertical: 16,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  subTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  statRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 4,
-  },
-  statName: {
-    textTransform: "capitalize",
-    fontWeight: 300,
-    fontSize: 16,
-    color: "#262525ff",
-  },
-  statValue: {
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-});

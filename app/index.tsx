@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
+import "./app.css";
 
 interface Pokemon {
   name: string;
@@ -86,67 +87,45 @@ export default function Index() {
   }, []);
 
   return (
-    <FlatList
-      data={pokemons}
-      numColumns={2}
-      columnWrapperStyle={{ gap: 16 }}
-      contentContainerStyle={{ gap: 16, padding: 16 }}
-      keyExtractor={(pokemon) => pokemon.name}
-      renderItem={({ item: pokemon }) => (
-        <Link
-          href={{
-            pathname: "/pokemonDetails",
-            params: {
-              name: pokemon.name,
-            },
-          }}
-          style={{
-            ...styles.pokemonCard,
-            // @ts-ignore
-            backgroundColor: bgColorByType[pokemon.types[0].type.name] + "90",
-          }}
-        >
-          <View style={styles.pokemonContainer}>
-            <View style={styles.pokemonInfo}>
-              <Text style={styles.pokemonName}>{pokemon.name}</Text>
-              <Text style={styles.pokemonType}>
-                {pokemon.types[0].type.name}
-              </Text>
+    <>
+      <View className="bg-white">
+        <Text className="font-bold text-blue-500">Welcome to Nativewind!</Text>
+      </View>
+      <FlatList
+        data={pokemons}
+        numColumns={2}
+        columnWrapperStyle={{ gap: 16 }}
+        contentContainerStyle={{ gap: 16, padding: 16 }}
+        keyExtractor={(pokemon) => pokemon.name}
+        renderItem={({ item: pokemon }) => (
+          <Link
+            href={{
+              pathname: "/pokemonDetails",
+              params: {
+                name: pokemon.name,
+              },
+            }}
+            className="w-[48%] rounded-[32px] p-2.5"
+            style={{
+              // @ts-ignore
+              backgroundColor: bgColorByType[pokemon.types[0].type.name] + "90",
+            }}
+          >
+            <View className="h-full w-full flex-col items-center justify-between">
+              <View className="items-center">
+                <Text className="text-xl font-bold capitalize">
+                  {pokemon.name}
+                </Text>
+                <Text className="capitalize">{pokemon.types[0].type.name}</Text>
+              </View>
+              <Image
+                source={{ uri: pokemon.image }}
+                style={{ width: 150, height: 150 }}
+              />
             </View>
-            <Image
-              source={{ uri: pokemon.image }}
-              style={{ width: 150, height: 150 }}
-            />
-          </View>
-        </Link>
-      )}
-    />
+          </Link>
+        )}
+      />
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  pokemonCard: {
-    borderRadius: 32,
-    padding: 10,
-    width: "48%",
-  },
-  pokemonContainer: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    height: "100%",
-  },
-  pokemonInfo: {
-    alignItems: "center",
-  },
-  pokemonName: {
-    fontWeight: "bold",
-    fontSize: 20,
-    textTransform: "capitalize",
-  },
-  pokemonType: {
-    textTransform: "capitalize",
-  },
-});
