@@ -3,6 +3,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "../global.css";
+import { PortalHost } from "@rn-primitives/portal";
 
 export default function Layout() {
   return (
@@ -16,6 +17,7 @@ export default function Layout() {
             }}
           />
         </SafeAreaView>
+        <PortalHost />
       </SafeAreaProvider>
     </>
   );
