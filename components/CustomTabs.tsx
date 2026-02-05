@@ -33,7 +33,7 @@ const CustomTabs: React.FC<CustomTabsProps> = ({
       value={value}
       onValueChange={setValue}
       className={className}
-      style={{ zIndex: 100 }}
+      style={{ flex: 1, zIndex: 100 }}
     >
       <TabsList
         className={cn("self-start gap-4 bg-transparent", tabListClassName)}
@@ -66,9 +66,10 @@ const CustomTabs: React.FC<CustomTabsProps> = ({
         <TabsContent
           key={tab.key}
           value={tab.key}
-          className={cn("px-2", tab.contentClassName)}
+          style={{ flex: 1 }}
+          className={cn("px-2 mt-2", tab.contentClassName)}
         >
-          <View>{tab.content}</View>
+          <View style={{ flex: 1 }}>{tab.content}</View>
         </TabsContent>
       ))}
     </Tabs>

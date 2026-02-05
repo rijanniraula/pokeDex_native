@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,6 +7,7 @@ import { useEffect, useState } from "react";
 import { View, Image, ScrollView, Text } from "react-native";
 import { BG_COLOR_BY_TYPE, STAT_COLOR_BY_TYPE } from "@/lib/constants";
 import CustomTabs, { TabItem } from "@/components/CustomTabs";
+import { RadarChart } from "react-native-gifted-charts";
 
 interface Pokemon {
   id: number;
@@ -114,32 +114,56 @@ export default function PokemonDetails() {
       key: "stats",
       title: "Stats",
       content: (
-        <>
-          {pokemon?.stats.map((stat) => (
-            <View key={stat.stat.name} className="flex-row items-center mb-2">
-              {/* Name column */}
-              <View className="w-[140px] flex-row items-center justify-between">
-                <Text className="capitalize font-light text-base text-[#262525]">
-                  {stat.stat.name}
-                </Text>
-                <Text className="font-bold text-base">{stat.base_stat}</Text>
-              </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View className="flex-column items-center gap-2">
+            {pokemon?.stats.map((stat) => (
+              <View key={stat.stat.name} className="flex-row items-center">
+                {/* Name column */}
+                <View className="w-[140px] flex-row items-center justify-between">
+                  <Text className="capitalize font-light text-base text-[#262525]">
+                    {stat.stat.name}
+                  </Text>
+                  <Text className="font-bold text-base">{stat.base_stat}</Text>
+                </View>
 
-              {/* Bar + value */}
-              <View className="flex-1 h-2 bg-gray-200 rounded-full ml-2">
-                <View
-                  className="h-2 rounded-full"
-                  style={{
-                    width: `${(stat.base_stat / 255) * 100}%`,
-                    backgroundColor:
-                      // @ts-ignore
-                      STAT_COLOR_BY_TYPE[stat.stat.name] || "#fff",
-                  }}
-                />
+                {/* Bar + value */}
+                <View className="flex-1 h-2 bg-gray-200 rounded-full ml-2">
+                  <View
+                    className="h-2 rounded-full"
+                    style={{
+                      width: `${(stat.base_stat / 255) * 100}%`,
+                      backgroundColor:
+                        // @ts-ignore
+                        STAT_COLOR_BY_TYPE[stat.stat.name] || "#fff",
+                    }}
+                  />
+                </View>
               </View>
-            </View>
-          ))}
-        </>
+            ))}
+          </View>
+          <RadarChart
+            hideAsterLines={true}
+            gridConfig={{
+              showGradient: true,
+              gradientColor: "#e9eff2ff",
+              gradientOpacity: 0.5,
+              fill: "#e9eff2ff",
+            }}
+            isAnimated={true}
+            animationDuration={1000}
+            startAngle={90}
+            data={pokemon?.stats.map((stat) => stat.base_stat)}
+            labels={pokemon?.stats.map(
+              (stat) =>
+                stat.stat.name.charAt(0).toUpperCase() +
+                stat.stat.name.slice(1),
+            )}
+            dataLabels={pokemon?.stats.map((stat) => stat.base_stat.toString())}
+            dataLabelsConfig={{ stroke: "transparent" }}
+            dataLabelsPositionOffset={0}
+            maxValue={255}
+          />
+        </ScrollView>
       ),
     },
     {
@@ -156,21 +180,15 @@ export default function PokemonDetails() {
           animation: "slide_from_right",
         }}
       />
-      <ScrollView
+      <View
         style={{
+          flex: 1,
           backgroundColor:
             // @ts-ignore
             BG_COLOR_BY_TYPE[pokemon?.types[0].type.name] || "#fff",
         }}
       >
-        <View
-          className="flex-1 pt-2"
-          style={{
-            backgroundColor:
-              // @ts-ignore
-              BG_COLOR_BY_TYPE[pokemon?.types[0].type.name] || "#fff",
-          }}
-        >
+        <View style={{ flex: 1 }}>
           <View className="px-2 flex-row justify-between ">
             <View className="flex-row gap-3">
               <Pressable onPress={() => router.back()} className="mt-1">
@@ -202,7 +220,7 @@ export default function PokemonDetails() {
             </View>
           </View>
 
-          <View className="w-full justify-center items-center z-50 relative">
+          <View className="w-full justify-center items-center z-50 relative h-[310px]">
             <Image
               source={require("../assets/images/pokeballWhite.webp")}
               className="absolute top-0 right-12 z-0 opacity-20"
@@ -210,14 +228,18 @@ export default function PokemonDetails() {
             />
             <Image
               source={{ uri: pokemon?.image }}
+              style={{
+                position: "absolute",
+                top: 0,
+                alignSelf: "center",
+                width: "100%",
+                height: 400,
+                zIndex: 0,
+              }}
               resizeMode="contain"
-              className="w-full h-[400px] absolute top-0 right-0 "
-              style={
-                { zIndex: 100, filter: "brightness(1.1) contrast(1.2)" } as any
-              }
             />
           </View>
-          <View className="w-full h-[110%] px-4 pt-16 bg-white rounded-t-[50px] mt-[320px]">
+          <View className="flex-1 px-4 pt-16 bg-white rounded-t-[50px]">
             <CustomTabs
               tabs={tabsData}
               defaultValue={tabsData[0].key}
@@ -225,7 +247,7 @@ export default function PokemonDetails() {
             />
           </View>
         </View>
-      </ScrollView>
+      </View>
     </>
   );
 }
