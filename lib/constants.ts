@@ -26,3 +26,12 @@ export const BG_COLOR_BY_TYPE = {
   shadow: "#6C63E5",
   stellar: "#6F7CFF",
 };
+
+export const STAT_COLOR_BY_TYPE = {
+  hp: "#6EDCC4",
+  attack: "#fc7a6c",
+  defense: "#6fa8ff",
+  "special-attack": "#ffd45a",
+  "special-defense": "#c4c095ff",
+  speed: "#9edb4f",
+};

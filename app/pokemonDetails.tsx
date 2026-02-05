@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import { useEffect, useState } from "react";
 import { View, Image, ScrollView, Text } from "react-native";
-import { BG_COLOR_BY_TYPE } from "@/lib/constants";
+import { BG_COLOR_BY_TYPE, STAT_COLOR_BY_TYPE } from "@/lib/constants";
 import CustomTabs, { TabItem } from "@/components/CustomTabs";
 
 interface Pokemon {
@@ -116,14 +116,27 @@ export default function PokemonDetails() {
       content: (
         <>
           {pokemon?.stats.map((stat) => (
-            <View
-              key={stat.stat.name}
-              className="flex-row justify-between mb-2"
-            >
-              <Text className="capitalize font-light text-base text-[#262525]">
-                {stat.stat.name}
-              </Text>
-              <Text className="font-bold text-base">{stat.base_stat}</Text>
+            <View key={stat.stat.name} className="flex-row items-center mb-2">
+              {/* Name column */}
+              <View className="w-[140px] flex-row items-center justify-between">
+                <Text className="capitalize font-light text-base text-[#262525]">
+                  {stat.stat.name}
+                </Text>
+                <Text className="font-bold text-base">{stat.base_stat}</Text>
+              </View>
+
+              {/* Bar + value */}
+              <View className="flex-1 h-2 bg-gray-200 rounded-full ml-2">
+                <View
+                  className="h-2 rounded-full"
+                  style={{
+                    width: `${(stat.base_stat / 255) * 100}%`,
+                    backgroundColor:
+                      // @ts-ignore
+                      STAT_COLOR_BY_TYPE[stat.stat.name] || "#fff",
+                  }}
+                />
+              </View>
             </View>
           ))}
         </>
