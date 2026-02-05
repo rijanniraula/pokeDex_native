@@ -1,6 +1,6 @@
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
-import { FlatList, Text, View, Image } from "react-native";
+import { Text, FlatList, View, Image } from "react-native";
 import { BG_COLOR_BY_TYPE } from "@/lib/constants";
 
 interface Pokemon {
@@ -57,9 +57,6 @@ export default function PokedexPage() {
 
   return (
     <>
-      <View className="bg-white">
-        <Text className="font-bold text-blue-500">Welcome to Nativewind!</Text>
-      </View>
       <FlatList
         data={pokemons}
         numColumns={2}

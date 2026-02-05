@@ -1,14 +1,23 @@
-import { useLocalSearchParams } from "expo-router";
+import * as React from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Stack, useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import { useEffect, useState } from "react";
-import { Text, View, Image, ScrollView } from "react-native";
+import { View, Image, ScrollView, Text } from "react-native";
 import { BG_COLOR_BY_TYPE } from "@/lib/constants";
+import CustomTabs, { TabItem } from "@/components/CustomTabs";
 
 interface Pokemon {
   id: number;
   name: string;
+  flavor_text_entries: {
+    flavor_text: string;
+    language: {
+      name: string;
+    };
+  }[];
   image: string;
   imageBack: string;
   types: PokemonTypes[];
@@ -34,20 +43,36 @@ interface PokemonTypes {
 export default function PokemonDetails() {
   const [pokemon, setPokemon] = useState<Pokemon>();
   const { name } = useLocalSearchParams();
+  const [value, setValue] = React.useState("account");
 
   const fetchPokemonDetails = async () => {
-    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
-    const data = await response.json();
+    const [pokemonRes, speciesRes] = await Promise.all([
+      fetch(`https://pokeapi.co/api/v2/pokemon/${name}`),
+      fetch(`https://pokeapi.co/api/v2/pokemon-species/${name}`),
+    ]);
+
+    const pokemonData = await pokemonRes.json();
+    const speciesData = await speciesRes.json();
+
+    const description = speciesData.flavor_text_entries
+      .find(
+        (entry: any) =>
+          entry.language.name === "en" && entry.version.name === "sapphire",
+      )
+      ?.flavor_text.replace(/\f|\n/g, " ");
+
     const pokemonDetail = {
-      id: data.id,
-      name: data.name,
-      image: data.sprites.other["official-artwork"].front_default,
-      imageBack: data.sprites.other["official-artwork"].back_default,
-      types: data.types,
-      height: data.height,
-      weight: data.weight,
-      stats: data.stats,
+      id: pokemonData.id,
+      name: pokemonData.name,
+      flavor_text_entries: speciesData.flavor_text_entries,
+      image: pokemonData.sprites.other["official-artwork"].front_default,
+      imageBack: pokemonData.sprites.other["official-artwork"].back_default,
+      types: pokemonData.types,
+      height: pokemonData.height,
+      weight: pokemonData.weight,
+      stats: pokemonData.stats,
     };
+
     setPokemon(pokemonDetail);
   };
 
@@ -55,8 +80,69 @@ export default function PokemonDetails() {
     fetchPokemonDetails();
   }, []);
 
+  const tabsData: TabItem[] = [
+    {
+      key: "about",
+      title: "About",
+      content: (
+        <>
+          <Text className="text-base font-semibold mb-2">
+            {pokemon?.flavor_text_entries
+              .find(
+                (entry: any) =>
+                  entry.language.name === "en" &&
+                  entry.version.name === "sapphire",
+              )
+              ?.flavor_text.replace(/\f|\n/g, " ")}
+          </Text>
+          <View className="flex-row justify-between py-1">
+            <Text className="capitalize font-light text-base text-gray-500">
+              Height
+            </Text>
+            <Text className="font-bold text-base">{pokemon?.height}</Text>
+          </View>
+          <View className="flex-row justify-between py-1">
+            <Text className="capitalize font-light text-base text-gray-500">
+              Weight
+            </Text>
+            <Text className="font-bold text-base">{pokemon?.weight}</Text>
+          </View>
+        </>
+      ),
+    },
+    {
+      key: "stats",
+      title: "Stats",
+      content: (
+        <>
+          {pokemon?.stats.map((stat) => (
+            <View
+              key={stat.stat.name}
+              className="flex-row justify-between mb-2"
+            >
+              <Text className="capitalize font-light text-base text-[#262525]">
+                {stat.stat.name}
+              </Text>
+              <Text className="font-bold text-base">{stat.base_stat}</Text>
+            </View>
+          ))}
+        </>
+      ),
+    },
+    {
+      key: "evolution",
+      title: "Evolution",
+      content: <Text>Notification settings</Text>,
+    },
+  ];
+
   return (
     <>
+      <Stack.Screen
+        options={{
+          animation: "slide_from_right",
+        }}
+      />
       <ScrollView
         style={{
           backgroundColor:
@@ -111,41 +197,19 @@ export default function PokemonDetails() {
             />
             <Image
               source={{ uri: pokemon?.image }}
-              className="w-[400px] h-[400px] object-contain -mb-[80px]"
+              resizeMode="contain"
+              className="w-full h-[400px] absolute top-0 right-0 "
               style={
                 { zIndex: 100, filter: "brightness(1.1) contrast(1.2)" } as any
               }
             />
           </View>
-          <View className="w-full h-[150%] p-8 bg-white rounded-[50px]">
-            <View className="my-4">
-              <Text className="text-2xl font-bold mb-2">About</Text>
-              <View className="flex-row justify-between py-1">
-                <Text className="capitalize font-light text-base text-[#262525]">
-                  Height
-                </Text>
-                <Text className="font-bold text-base">{pokemon?.height}</Text>
-              </View>
-              <View className="flex-row justify-between py-1">
-                <Text className="capitalize font-light text-base text-[#262525]">
-                  Weight
-                </Text>
-                <Text className="font-bold text-base">{pokemon?.weight}</Text>
-              </View>
-            </View>
-
-            <Text className="text-2xl font-bold mb-2">Stats</Text>
-            {pokemon?.stats.map((stat) => (
-              <View
-                key={stat.stat.name}
-                className="flex-row justify-between py-1"
-              >
-                <Text className="capitalize font-light text-base text-[#262525]">
-                  {stat.stat.name}
-                </Text>
-                <Text className="font-bold text-base">{stat.base_stat}</Text>
-              </View>
-            ))}
+          <View className="w-full h-[110%] px-4 pt-16 bg-white rounded-t-[50px] mt-[320px]">
+            <CustomTabs
+              tabs={tabsData}
+              defaultValue={tabsData[0].key}
+              className="w-full"
+            />
           </View>
         </View>
       </ScrollView>

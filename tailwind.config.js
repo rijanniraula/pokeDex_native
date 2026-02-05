@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   // NOTE: Update this to include the paths to all files that contain Nativewind classes.
   darkMode: "class",
@@ -10,6 +11,9 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+      fontFamily: {
+        poppins: ["PoppinsMedium"], // must match the name from useFonts
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
