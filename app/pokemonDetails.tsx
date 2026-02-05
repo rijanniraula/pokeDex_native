@@ -1,13 +1,20 @@
 import * as React from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import { useEffect, useState } from "react";
 import { View, Image, ScrollView, Text } from "react-native";
 import { BG_COLOR_BY_TYPE, STAT_COLOR_BY_TYPE } from "@/lib/constants";
 import CustomTabs, { TabItem } from "@/components/CustomTabs";
 import { RadarChart } from "react-native-gifted-charts";
+import {
+  heightToCm,
+  heightToFeetInches,
+  weightToKg,
+  weightToLbs,
+} from "@/lib/unitConverter";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 interface Pokemon {
   id: number;
@@ -24,6 +31,7 @@ interface Pokemon {
   height: number;
   weight: number;
   stats: PokemonStat[];
+  abilities: PokemonAbility[];
 }
 
 interface PokemonStat {
@@ -35,6 +43,13 @@ interface PokemonStat {
 
 interface PokemonTypes {
   type: {
+    name: string;
+    url: string;
+  };
+}
+
+interface PokemonAbility {
+  ability: {
     name: string;
     url: string;
   };
@@ -71,6 +86,7 @@ export default function PokemonDetails() {
       height: pokemonData.height,
       weight: pokemonData.weight,
       stats: pokemonData.stats,
+      abilities: pokemonData.abilities,
     };
 
     setPokemon(pokemonDetail);
@@ -86,7 +102,7 @@ export default function PokemonDetails() {
       title: "About",
       content: (
         <>
-          <Text className="text-base font-semibold mb-2">
+          <Text className="text-lg font-light mb-2">
             {pokemon?.flavor_text_entries
               .find(
                 (entry: any) =>
@@ -95,17 +111,47 @@ export default function PokemonDetails() {
               )
               ?.flavor_text.replace(/\f|\n/g, " ")}
           </Text>
-          <View className="flex-row justify-between py-1">
-            <Text className="capitalize font-light text-base text-gray-500">
-              Height
-            </Text>
-            <Text className="font-bold text-base">{pokemon?.height}</Text>
+          <View className="flex-row justify-between mt-2 p-2 rounded-xl">
+            <View className="flex-column gap-2 items-center border border-gray-400 rounded-xl p-2 w-[48%]">
+              <View className="flex-row items-center gap-1">
+                <FontAwesome5 name="ruler" size={16} color="gray" />
+                <Text className="font-light text-lg text-gray-500">Height</Text>
+              </View>
+              <Text className="font-bold text-lg">
+                {pokemon?.height
+                  ? `${heightToCm(pokemon.height)} cm (${heightToFeetInches(pokemon.height)})`
+                  : "--"}
+              </Text>
+            </View>
+
+            <View className="flex-column gap-2 items-center border border-gray-400 rounded-xl p-2 w-[48%]">
+              <View className="flex-row items-center gap-1">
+                <FontAwesome6 name="weight-hanging" size={16} color="gray" />
+                <Text className="font-light text-lg text-gray-500">Weight</Text>
+              </View>
+              <Text className="font-bold text-lg">
+                {pokemon?.weight
+                  ? `${weightToKg(pokemon.weight)} kg (${weightToLbs(pokemon.weight)} lbs)`
+                  : "--"}
+              </Text>
+            </View>
           </View>
-          <View className="flex-row justify-between py-1">
-            <Text className="capitalize font-light text-base text-gray-500">
-              Weight
-            </Text>
-            <Text className="font-bold text-base">{pokemon?.weight}</Text>
+
+          <View>
+            <Text className="text-2xl font-semibold mt-4 mb-2">Abilities</Text>
+            <View className="flex-column gap-4">
+              {pokemon?.abilities.map((ability) => (
+                <View
+                  key={ability.ability.name}
+                  className="flex-row items-center border border-gray-300 rounded-xl px-4 py-6"
+                >
+                  <View className="w-2 h-2 bg-gray-500 rounded-full mr-2" />
+                  <Text className="capitalize font-light text-base text-[#262525]">
+                    {ability.ability.name}
+                  </Text>
+                </View>
+              ))}
+            </View>
           </View>
         </>
       ),
@@ -183,6 +229,7 @@ export default function PokemonDetails() {
       <View
         style={{
           flex: 1,
+          paddingTop: 12,
           backgroundColor:
             // @ts-ignore
             BG_COLOR_BY_TYPE[pokemon?.types[0].type.name] || "#fff",
