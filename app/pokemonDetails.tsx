@@ -1,19 +1,13 @@
-import { Stack, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import { useEffect, useState } from "react";
-import {
-  FlatList,
-  Text,
-  View,
-  Image,
-  StyleSheet,
-  ScrollView,
-  StatusBar,
-} from "react-native";
+import { Text, View, Image, ScrollView } from "react-native";
+import { BG_COLOR_BY_TYPE } from "@/lib/constants";
 
 interface Pokemon {
+  id: number;
   name: string;
   image: string;
   imageBack: string;
@@ -37,30 +31,6 @@ interface PokemonTypes {
   };
 }
 
-const bgColorByType = {
-  grass: "#6EDC9A",
-  fire: "#FC6C6D",
-  water: "#6FA8FF",
-  electric: "#FFD45A",
-  normal: "#DAD8C2",
-  bug: "#9EDB4F",
-  poison: "#C86EDC",
-  flying: "#9FA8FF",
-  ground: "#F0C46A",
-  rock: "#D0AF52",
-  steel: "#C9CBDC",
-  psychic: "#FF6FA2",
-  ice: "#6FDADA",
-  dragon: "#7C6CFF",
-  dark: "#7A6A5A",
-  fairy: "#FF9BCB",
-  fighting: "#F26B5B",
-  ghost: "#8E7AD6",
-  unknown: "#6ED6C6",
-  shadow: "#6C63E5",
-  stellar: "#6F7CFF",
-};
-
 export default function PokemonDetails() {
   const [pokemon, setPokemon] = useState<Pokemon>();
   const { name } = useLocalSearchParams();
@@ -69,8 +39,9 @@ export default function PokemonDetails() {
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
     const data = await response.json();
     const pokemonDetail = {
+      id: data.id,
       name: data.name,
-      image: data.sprites.other["showdown"].front_default,
+      image: data.sprites.other["official-artwork"].front_default,
       imageBack: data.sprites.other["official-artwork"].back_default,
       types: data.types,
       height: data.height,
@@ -88,8 +59,9 @@ export default function PokemonDetails() {
     <>
       <ScrollView
         style={{
-          // @ts-ignore
-          backgroundColor: bgColorByType[pokemon?.types[0].type.name] || "#fff",
+          backgroundColor:
+            // @ts-ignore
+            BG_COLOR_BY_TYPE[pokemon?.types[0].type.name] || "#fff",
         }}
       >
         <View
@@ -97,10 +69,10 @@ export default function PokemonDetails() {
           style={{
             backgroundColor:
               // @ts-ignore
-              bgColorByType[pokemon?.types[0].type.name] || "#fff",
+              BG_COLOR_BY_TYPE[pokemon?.types[0].type.name] || "#fff",
           }}
         >
-          <View className="p-4">
+          <View className="px-2 flex-row justify-between ">
             <View className="flex-row gap-3">
               <Pressable onPress={() => router.back()} className="mt-1">
                 <Ionicons name="arrow-back" size={28} color="white" />
@@ -114,7 +86,8 @@ export default function PokemonDetails() {
                     <Text
                       key={type.type.name}
                       className="capitalize bg-white font-bold py-2 px-4 rounded-[32px] mt-2"
-                      style={{ color: bgColorByType[type.type.name] }}
+                      // @ts-ignore
+                      style={{ color: BG_COLOR_BY_TYPE[type.type.name] }}
                     >
                       {type.type.name}
                     </Text>
@@ -122,20 +95,23 @@ export default function PokemonDetails() {
                 </View>
               </View>
             </View>
+            <View>
+              <Text className="text-3xl font-bold text-white">
+                #
+                {pokemon?.id ? pokemon.id.toString().padStart(6, "0") : ""}{" "}
+              </Text>
+            </View>
           </View>
 
           <View className="w-full justify-center items-center z-50 relative">
             <Image
-              source={{
-                uri: "https://icons.veryicon.com/png/128/object/material-design-icons-1/pokeball-1.png",
-              }}
-              className="absolute top-0 right-0 z-0 opacity-20"
-              width={200}
-              height={200}
+              source={require("../assets/images/pokeballWhite.webp")}
+              className="absolute top-0 right-12 z-0 opacity-20"
+              style={{ width: 200, height: 200 }}
             />
             <Image
               source={{ uri: pokemon?.image }}
-              className="w-[400px] h-[400px] object-contain -mb-[100px]"
+              className="w-[400px] h-[400px] object-contain -mb-[80px]"
               style={
                 { zIndex: 100, filter: "brightness(1.1) contrast(1.2)" } as any
               }
