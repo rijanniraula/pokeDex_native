@@ -372,6 +372,8 @@ export default function PokemonDetails() {
                   borderColor:
                     pokemonTypes.find((type) => type.value === move.move.type)
                       ?.color || "#fff",
+                  borderWidth: 1,
+                  borderRadius: 16,
                 }}
               >
                 <View

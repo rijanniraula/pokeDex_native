@@ -86,48 +86,50 @@ export default function PokedexPage() {
           style={{ backgroundColor: "#fff" }}
         />
       </View>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        className="mx-3 my-2"
-        style={{ height: 50 }}
-      >
-        {[
-          {
-            value: "all",
-            label: "All",
-            color: "#b71010",
-            icon: (
-              <MaterialCommunityIcons
-                name="pokeball"
-                size={16}
-                color="#b71010"
-              />
-            ),
-          },
-          ...pokemonTypes,
-        ].map((type) => (
-          <Pressable
-            key={type.value}
-            className="flex-row items-center gap-2 border border-gray-200 rounded-full px-4 py-2 mx-1"
-            style={{
-              backgroundColor:
-                selectedType === type.value
-                  ? BG_COLOR_BY_TYPE[type.value] + "50"
-                  : "transparent",
-              borderColor: BG_COLOR_BY_TYPE[type.value],
-            }}
-            onPress={() => {
-              setSelectedType(type.value);
-            }}
-          >
-            {type.icon}
-            <Text className="capitalize font-light text-base ">
-              {type.label}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+      <View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="mx-3 my-2"
+          // style={{ height: 50 }}
+        >
+          {[
+            {
+              value: "all",
+              label: "All",
+              color: "#b71010",
+              icon: (
+                <MaterialCommunityIcons
+                  name="pokeball"
+                  size={16}
+                  color="#b71010"
+                />
+              ),
+            },
+            ...pokemonTypes,
+          ].map((type) => (
+            <Pressable
+              key={type.value}
+              className="flex-row items-center gap-2 border border-gray-200 rounded-full px-4 py-2 mx-1"
+              style={{
+                backgroundColor:
+                  selectedType === type.value
+                    ? BG_COLOR_BY_TYPE[type.value] + "50"
+                    : "transparent",
+                borderColor: BG_COLOR_BY_TYPE[type.value],
+              }}
+              onPress={() => {
+                setSelectedType(type.value);
+              }}
+            >
+              {type.icon}
+              <Text className="capitalize font-light text-base ">
+                {type.label}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
       <FlatList
         data={filteredPokemons}
         numColumns={2}
