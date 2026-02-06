@@ -10,21 +10,7 @@ import {
 } from "react-native";
 import { BG_COLOR_BY_TYPE, pokemonTypes } from "@/lib/constants";
 import { Input } from "@/components/ui/input";
-
-interface Pokemon {
-  name: string;
-  url: string;
-  image: string;
-  imageBack: string;
-  types: PokemonTypes[];
-}
-
-interface PokemonTypes {
-  type: {
-    name: string;
-    url: string;
-  };
-}
+import { Pokemon } from "@/types/Pokemon";
 
 export default function PokedexPage() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -41,9 +27,10 @@ export default function PokedexPage() {
       try {
         const pokemonDetail = await Promise.all(
           data.results.map(async (pokemon: Pokemon) => {
-            const req = await fetch(pokemon.url);
+            const req = await fetch(pokemon.url!);
             const res = await req.json();
             return {
+              id: res.id,
               name: pokemon.name,
               image: res.sprites.other["showdown"].front_default,
               imageBack: res.sprites.back_default,
@@ -116,6 +103,7 @@ export default function PokedexPage() {
               pathname: "/pokemonDetails",
               params: {
                 name: pokemon.name,
+                id: pokemon.id,
               },
             }}
             className="w-[48%] h-[160px] rounded-3xl"

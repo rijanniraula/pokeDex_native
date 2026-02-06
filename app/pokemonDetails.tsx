@@ -15,50 +15,16 @@ import {
   weightToLbs,
 } from "@/lib/unitConverter";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-
-interface Pokemon {
-  id: number;
-  name: string;
-  flavor_text_entries: {
-    flavor_text: string;
-    language: {
-      name: string;
-    };
-  }[];
-  image: string;
-  imageBack: string;
-  types: PokemonTypes[];
-  height: number;
-  weight: number;
-  stats: PokemonStat[];
-  abilities: PokemonAbility[];
-}
-
-interface PokemonStat {
-  base_stat: number;
-  stat: {
-    name: string;
-  };
-}
-
-interface PokemonTypes {
-  type: {
-    name: string;
-    url: string;
-  };
-}
-
-interface PokemonAbility {
-  ability: {
-    name: string;
-    url: string;
-  };
-}
+import { Pokemon } from "@/types/Pokemon";
+import { extractEvolutionChain } from "@/lib/extractEvolutionChain";
 
 export default function PokemonDetails() {
   const [pokemon, setPokemon] = useState<Pokemon>();
-  const { name } = useLocalSearchParams();
-  const [value, setValue] = React.useState("account");
+  const [evolutionChain, setEvolutionChain] = useState<any>();
+  const [evolutionPokemons, setEvolutionPokemons] = useState<Pokemon[]>([]);
+
+  const { name, id } = useLocalSearchParams();
+  console.log(id);
 
   const fetchPokemonDetails = async () => {
     const [pokemonRes, speciesRes] = await Promise.all([
@@ -69,14 +35,7 @@ export default function PokemonDetails() {
     const pokemonData = await pokemonRes.json();
     const speciesData = await speciesRes.json();
 
-    const description = speciesData.flavor_text_entries
-      .find(
-        (entry: any) =>
-          entry.language.name === "en" && entry.version.name === "sapphire",
-      )
-      ?.flavor_text.replace(/\f|\n/g, " ");
-
-    const pokemonDetail = {
+    const pokemonDetail: Pokemon = {
       id: pokemonData.id,
       name: pokemonData.name,
       flavor_text_entries: speciesData.flavor_text_entries,
@@ -87,15 +46,54 @@ export default function PokemonDetails() {
       weight: pokemonData.weight,
       stats: pokemonData.stats,
       abilities: pokemonData.abilities,
+      evolution_chain_url: speciesData.evolution_chain.url,
     };
 
     setPokemon(pokemonDetail);
+  };
+
+  const fetchEvolutionChain = async () => {
+    const response = await fetch(`${pokemon?.evolution_chain_url}`);
+    const data = await response.json();
+    setEvolutionChain(data);
+  };
+
+  const fetchEvolutionPokemons = async (names: string[]) => {
+    const results = await Promise.all(
+      names.map(async (name) => {
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+        const data = await res.json();
+
+        return {
+          id: data.id,
+          name: data.name,
+          image: data.sprites.other["official-artwork"].front_default,
+          types: data.types,
+        };
+      }),
+    );
+
+    setEvolutionPokemons(results);
   };
 
   useEffect(() => {
     fetchPokemonDetails();
   }, []);
 
+  useEffect(() => {
+    if (pokemon?.evolution_chain_url) {
+      fetchEvolutionChain();
+    }
+  }, [pokemon?.evolution_chain_url]);
+
+  useEffect(() => {
+    if (evolutionChain?.chain) {
+      const names = extractEvolutionChain(evolutionChain.chain);
+      fetchEvolutionPokemons(names);
+    }
+  }, [evolutionChain]);
+
+  console.log("Evolution chain: ", evolutionChain);
   const tabsData: TabItem[] = [
     {
       key: "about",
@@ -172,7 +170,6 @@ export default function PokemonDetails() {
                   <Text className="font-bold text-base">{stat.base_stat}</Text>
                 </View>
 
-                {/* Bar + value */}
                 <View className="flex-1 h-2 bg-gray-200 rounded-full ml-2">
                   <View
                     className="h-2 rounded-full"
@@ -215,7 +212,68 @@ export default function PokemonDetails() {
     {
       key: "evolution",
       title: "Evolution",
-      content: <Text>Notification settings</Text>,
+      content: (
+        <View>
+          <View className="flex-row flex-wrap gap-4">
+            {evolutionPokemons.map((pokemon) => (
+              <Pressable
+                key={pokemon.id}
+                onPress={() =>
+                  router.push({
+                    pathname: "/pokemonDetails",
+                    params: { name: pokemon.name, id: pokemon.id },
+                  })
+                }
+                className="w-[48%] h-[140px] rounded-3xl"
+                style={{
+                  // @ts-ignore
+                  backgroundColor: BG_COLOR_BY_TYPE[pokemon.types[0].type.name],
+                }}
+              >
+                <View className="h-full w-full relative overflow-hidden">
+                  <Image
+                    source={require("@/assets/images/pokeballWhite.webp")}
+                    className="absolute -bottom-10 -right-10 opacity-20"
+                    style={{ width: 120, height: 120 }}
+                  />
+
+                  <View className="mt-4 ml-4">
+                    <Text className="text-lg font-bold text-white capitalize">
+                      {pokemon.name}
+                    </Text>
+                    <View className="flex-row gap-2">
+                      <Text className="capitalize bg-white/30 font-bold py-2 px-4 mt-1 w-fit rounded-[32px] color-white">
+                        {pokemon.types[0].type.name}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Image
+                    source={{ uri: pokemon.image }}
+                    resizeMode="contain"
+                    style={{
+                      width: 90,
+                      height: 90,
+                      position: "absolute",
+                      bottom: 4,
+                      right: 4,
+                    }}
+                  />
+                </View>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+      ),
+    },
+    {
+      key: "moves",
+      title: "Move Set",
+      content: (
+        <View>
+          <Text>test</Text>
+        </View>
+      ),
     },
   ];
 
