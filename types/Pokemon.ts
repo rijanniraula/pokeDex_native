@@ -17,6 +17,9 @@ export interface Pokemon {
   abilities: PokemonAbility[];
   evolution_chain_url?: string;
   evolution_chain?: PokemonEvolutionChain;
+  moves?: PokemonMove[];
+  capture_rate?: string;
+  habitat?: string;
 }
 
 export interface PokemonStat {
@@ -57,6 +60,25 @@ export interface PokemonEvolutionChain {
           url: string;
         };
       }[];
+    }[];
+  };
+}
+
+export interface PokemonMove {
+  move: {
+    name: string;
+    url: string;
+    accuracy?: number;
+    power?: number;
+    pp?: number;
+    type?: string;
+    category?: string;
+    damage_class?: string;
+    effect_entries?: {
+      effect: string;
+      language: {
+        name: string;
+      };
     }[];
   };
 }

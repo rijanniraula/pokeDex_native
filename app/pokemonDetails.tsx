@@ -1,11 +1,20 @@
 import * as React from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
-import { FontAwesome6, Ionicons } from "@expo/vector-icons";
+import {
+  Feather,
+  FontAwesome6,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import { useEffect, useState } from "react";
 import { View, Image, ScrollView, Text } from "react-native";
-import { BG_COLOR_BY_TYPE, STAT_COLOR_BY_TYPE } from "@/lib/constants";
+import {
+  BG_COLOR_BY_TYPE,
+  pokemonTypes,
+  STAT_COLOR_BY_TYPE,
+} from "@/lib/constants";
 import CustomTabs, { TabItem } from "@/components/CustomTabs";
 import { RadarChart } from "react-native-gifted-charts";
 import {
@@ -47,6 +56,9 @@ export default function PokemonDetails() {
       stats: pokemonData.stats,
       abilities: pokemonData.abilities,
       evolution_chain_url: speciesData.evolution_chain.url,
+      moves: pokemonData.moves,
+      capture_rate: speciesData.capture_rate,
+      habitat: speciesData.habitat?.name,
     };
 
     setPokemon(pokemonDetail);
@@ -76,6 +88,33 @@ export default function PokemonDetails() {
     setEvolutionPokemons(results);
   };
 
+  const fetchMoveDetail = async () => {
+    if (!pokemon?.moves) return;
+
+    const updatedMoves = await Promise.all(
+      pokemon.moves.map(async (m) => {
+        const res = await fetch(m.move.url);
+        const data = await res.json();
+
+        return {
+          ...m,
+          move: {
+            ...m.move,
+            accuracy: data.accuracy,
+            power: data.power,
+            pp: data.pp,
+            type: data.type?.name,
+            category: data.meta?.category?.name,
+            damage_class: data.damage_class?.name,
+            effect_entries: data.effect_entries,
+          },
+        };
+      }),
+    );
+
+    setPokemon((prev) => (prev ? { ...prev, moves: updatedMoves } : prev));
+  };
+
   useEffect(() => {
     fetchPokemonDetails();
   }, []);
@@ -93,64 +132,110 @@ export default function PokemonDetails() {
     }
   }, [evolutionChain]);
 
-  console.log("Evolution chain: ", evolutionChain);
+  useEffect(() => {
+    if (pokemon?.id) {
+      fetchMoveDetail();
+    }
+  }, [pokemon?.id]);
+
   const tabsData: TabItem[] = [
     {
       key: "about",
       title: "About",
       content: (
         <>
-          <Text className="text-lg font-light mb-2">
-            {pokemon?.flavor_text_entries
-              .find(
-                (entry: any) =>
-                  entry.language.name === "en" &&
-                  entry.version.name === "sapphire",
-              )
-              ?.flavor_text.replace(/\f|\n/g, " ")}
-          </Text>
-          <View className="flex-row justify-between mt-2 p-2 rounded-xl">
-            <View className="flex-column gap-2 items-center border border-gray-400 rounded-xl p-2 w-[48%]">
-              <View className="flex-row items-center gap-1">
-                <FontAwesome5 name="ruler" size={16} color="gray" />
-                <Text className="font-light text-lg text-gray-500">Height</Text>
-              </View>
-              <Text className="font-bold text-lg">
-                {pokemon?.height
-                  ? `${heightToCm(pokemon.height)} cm (${heightToFeetInches(pokemon.height)})`
-                  : "--"}
-              </Text>
-            </View>
-
-            <View className="flex-column gap-2 items-center border border-gray-400 rounded-xl p-2 w-[48%]">
-              <View className="flex-row items-center gap-1">
-                <FontAwesome6 name="weight-hanging" size={16} color="gray" />
-                <Text className="font-light text-lg text-gray-500">Weight</Text>
-              </View>
-              <Text className="font-bold text-lg">
-                {pokemon?.weight
-                  ? `${weightToKg(pokemon.weight)} kg (${weightToLbs(pokemon.weight)} lbs)`
-                  : "--"}
-              </Text>
-            </View>
-          </View>
-
-          <View>
-            <Text className="text-2xl font-semibold mt-4 mb-2">Abilities</Text>
-            <View className="flex-column gap-4">
-              {pokemon?.abilities.map((ability) => (
-                <View
-                  key={ability.ability.name}
-                  className="flex-row items-center border border-gray-300 rounded-xl px-4 py-6"
-                >
-                  <View className="w-2 h-2 bg-gray-500 rounded-full mr-2" />
-                  <Text className="capitalize font-light text-base text-[#262525]">
-                    {ability.ability.name}
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Text className="text-lg font-light mb-2">
+              {pokemon?.flavor_text_entries
+                .find(
+                  (entry: any) =>
+                    entry.language.name === "en" &&
+                    entry.version.name === "sapphire",
+                )
+                ?.flavor_text.replace(/\f|\n/g, " ")}
+            </Text>
+            <View className="flex-row justify-between mt-2 p-2 rounded-xl">
+              <View className="flex-column gap-2 items-center border border-gray-200 bg-gray-200 rounded-xl p-4 w-[48%]">
+                <View className="flex-row items-center gap-2">
+                  <FontAwesome5 name="ruler" size={14} color="gray" />
+                  <Text className="font-light text-lg text-gray-500">
+                    Height
                   </Text>
                 </View>
-              ))}
+                <Text className="font-bold text-lg">
+                  {pokemon?.height
+                    ? `${heightToCm(pokemon.height)} cm (${heightToFeetInches(pokemon.height)})`
+                    : "--"}
+                </Text>
+              </View>
+
+              <View className="flex-column gap-2 items-center border border-gray-200 bg-gray-200 rounded-xl p-4 w-[48%]">
+                <View className="flex-row items-center gap-2">
+                  <FontAwesome6 name="weight-hanging" size={14} color="gray" />
+                  <Text className="font-light text-lg text-gray-500">
+                    Weight
+                  </Text>
+                </View>
+                <Text className="font-bold text-lg">
+                  {pokemon?.weight
+                    ? `${weightToKg(pokemon.weight)} kg (${weightToLbs(pokemon.weight)} lbs)`
+                    : "--"}
+                </Text>
+              </View>
             </View>
-          </View>
+            <View className="flex-row justify-between mt-2 p-2 rounded-xl">
+              <View className="flex-column gap-2 items-center border border-gray-200 bg-gray-200 rounded-xl p-4 w-[48%]">
+                <View className="flex-row items-center gap-1">
+                  <MaterialCommunityIcons
+                    name="pokeball"
+                    size={16}
+                    color="gray"
+                  />
+                  <Text className="font-light text-lg text-gray-500">
+                    Capture Rate
+                  </Text>
+                </View>
+                <Text className="font-bold text-lg">
+                  {pokemon?.capture_rate}
+                </Text>
+              </View>
+
+              <View className="flex-column gap-2 items-center border border-gray-200 bg-gray-200 rounded-xl p-4 w-[48%]">
+                <View className="flex-row items-center gap-2">
+                  <FontAwesome6
+                    name="location-crosshairs"
+                    size={16}
+                    color="gray"
+                  />
+                  <Text className="font-light text-lg text-gray-500">
+                    Habitat
+                  </Text>
+                </View>
+                <Text className="font-bold text-lg">
+                  {pokemon?.habitat ? `${pokemon.habitat}` : "--"}
+                </Text>
+              </View>
+            </View>
+
+            <View>
+              <Text className="text-2xl font-semibold mt-4 mb-2">
+                Abilities
+              </Text>
+              <View className="flex-column gap-4">
+                {pokemon?.abilities.map((ability) => (
+                  <View
+                    key={ability.ability.name}
+                    className="flex-row items-center border border-gray-300 rounded-xl px-4 py-6"
+                  >
+                    <View className="w-2 h-2 bg-gray-500 rounded-full mr-2" />
+                    <Text className="capitalize font-light text-base text-[#262525]">
+                      {ability.ability.name}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </ScrollView>
         </>
       ),
     },
@@ -213,66 +298,120 @@ export default function PokemonDetails() {
       key: "evolution",
       title: "Evolution",
       content: (
-        <View>
-          <View className="flex-row flex-wrap gap-4">
-            {evolutionPokemons.map((pokemon) => (
-              <Pressable
-                key={pokemon.id}
-                onPress={() =>
-                  router.push({
-                    pathname: "/pokemonDetails",
-                    params: { name: pokemon.name, id: pokemon.id },
-                  })
-                }
-                className="w-[48%] h-[140px] rounded-3xl"
-                style={{
-                  // @ts-ignore
-                  backgroundColor: BG_COLOR_BY_TYPE[pokemon.types[0].type.name],
-                }}
-              >
-                <View className="h-full w-full relative overflow-hidden">
-                  <Image
-                    source={require("@/assets/images/pokeballWhite.webp")}
-                    className="absolute -bottom-10 -right-10 opacity-20"
-                    style={{ width: 120, height: 120 }}
-                  />
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View>
+            <View className="flex-row flex-wrap gap-4">
+              {evolutionPokemons.map((pokemon) => (
+                <Pressable
+                  key={pokemon.id}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/pokemonDetails",
+                      params: { name: pokemon.name, id: pokemon.id },
+                    })
+                  }
+                  className="w-[48%] h-[140px] rounded-3xl"
+                  style={{
+                    // @ts-ignore
+                    backgroundColor:
+                      BG_COLOR_BY_TYPE[pokemon.types[0].type.name],
+                  }}
+                >
+                  <View className="h-full w-full relative overflow-hidden">
+                    <Image
+                      source={require("@/assets/images/pokeballWhite.webp")}
+                      className="absolute -bottom-10 -right-10 opacity-20"
+                      style={{ width: 120, height: 120 }}
+                    />
 
-                  <View className="mt-4 ml-4">
-                    <Text className="text-lg font-bold text-white capitalize">
-                      {pokemon.name}
-                    </Text>
-                    <View className="flex-row gap-2">
-                      <Text className="capitalize bg-white/30 font-bold py-2 px-4 mt-1 w-fit rounded-[32px] color-white">
-                        {pokemon.types[0].type.name}
+                    <View className="mt-4 ml-4">
+                      <Text className="text-lg font-bold text-white capitalize">
+                        {pokemon.name}
                       </Text>
+                      <View className="flex-row gap-2">
+                        <Text className="capitalize bg-white/30 font-bold py-2 px-4 mt-1 w-fit rounded-[32px] color-white">
+                          {pokemon.types[0].type.name}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
 
-                  <Image
-                    source={{ uri: pokemon.image }}
-                    resizeMode="contain"
-                    style={{
-                      width: 90,
-                      height: 90,
-                      position: "absolute",
-                      bottom: 4,
-                      right: 4,
-                    }}
-                  />
-                </View>
-              </Pressable>
-            ))}
+                    <Image
+                      source={{ uri: pokemon.image }}
+                      resizeMode="contain"
+                      style={{
+                        width: 90,
+                        height: 90,
+                        position: "absolute",
+                        bottom: 4,
+                        right: 4,
+                      }}
+                    />
+                  </View>
+                </Pressable>
+              ))}
+            </View>
           </View>
-        </View>
+        </ScrollView>
       ),
     },
     {
       key: "moves",
       title: "Move Set",
       content: (
-        <View>
-          <Text>test</Text>
-        </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View className="flex-column gap-4">
+            {pokemon?.moves?.map((move) => (
+              <View
+                key={move.move.name}
+                className="flex-row gap-4 border border-gray-300 rounded-xl px-4 py-6"
+                style={{
+                  // @ts-ignore
+                  backgroundColor:
+                    pokemonTypes.find((type) => type.value === move.move.type)
+                      ?.color + "50" || "#fff",
+                  borderColor:
+                    pokemonTypes.find((type) => type.value === move.move.type)
+                      ?.color || "#fff",
+                }}
+              >
+                <View
+                  className="w-1/8 flex-1 flex-row items-center justify-center p-2 rounded-xl"
+                  style={{
+                    backgroundColor:
+                      pokemonTypes.find((type) => type.value === move.move.type)
+                        ?.color + "50" || "#fff",
+                  }}
+                >
+                  {
+                    pokemonTypes.find((type) => type.value === move.move.type)
+                      ?.icon
+                  }
+                </View>
+
+                <View className="w-5/6">
+                  <Text className="capitalize font-semibold text-base">
+                    {move.move.name}
+                  </Text>
+
+                  <View className="flex-row justify-between mt-2">
+                    <View className="flex-row items-center gap-1">
+                      <FontAwesome6 name="bolt" size={14} color="gray" />
+                      <Text>PWR: {move.move.power ?? "--"}</Text>
+                    </View>
+                    <View className="flex-row items-center gap-1">
+                      <Feather name="target" size={14} color="gray" />
+                      <Text>ACC: {move.move.accuracy ?? "--"}</Text>
+                    </View>
+                    <View className="flex-row items-center gap-1">
+                      <Ionicons name="pricetag" size={14} color="gray" />
+                      <Text>PP: {move.move.pp ?? "--"}</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+        </ScrollView>
       ),
     },
   ];
