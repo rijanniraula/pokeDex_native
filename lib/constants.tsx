@@ -7,6 +7,7 @@ export const ENDPOINTS = {
 };
 
 export const BG_COLOR_BY_TYPE = {
+  all: "#9f9a9a",
   grass: "#6edcc4",
   fire: "#fc7a6c",
   water: "#6fa8ff",

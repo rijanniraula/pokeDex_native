@@ -11,16 +11,18 @@ import {
 import { BG_COLOR_BY_TYPE, pokemonTypes } from "@/lib/constants";
 import { Input } from "@/components/ui/input";
 import { Pokemon } from "@/types/Pokemon";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function PokedexPage() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+  const [filteredPokemons, setFilteredPokemons] = useState<Pokemon[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<string>("all");
 
   const fetchPokemon = async () => {
     try {
       const response = await fetch(
-        "https://pokeapi.co/api/v2/pokemon?limit=100&offset=0",
+        "https://pokeapi.co/api/v2/pokemon?limit=100",
       );
       const data = await response.json();
 
@@ -52,9 +54,26 @@ export default function PokedexPage() {
     fetchPokemon();
   }, []);
 
-  const filteredPokemons = pokemons.filter((pokemon) =>
-    pokemon.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const handleFilterPokemon = () => {
+    const filtered = pokemons.filter((pokemon) => {
+      const matchesType =
+        selectedType === "all" ||
+        !selectedType ||
+        pokemon.types.some((type) => type.type.name === selectedType);
+
+      const matchesSearch =
+        !searchQuery ||
+        pokemon.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+      return matchesType && matchesSearch;
+    });
+
+    setFilteredPokemons(filtered);
+  };
+
+  useEffect(() => {
+    handleFilterPokemon();
+  }, [pokemons, selectedType, searchQuery]);
 
   return (
     <>
@@ -71,13 +90,31 @@ export default function PokedexPage() {
         horizontal
         showsHorizontalScrollIndicator={false}
         className="mx-3 my-2"
+        style={{ height: 50 }}
       >
-        {pokemonTypes.map((type) => (
+        {[
+          {
+            value: "all",
+            label: "All",
+            color: "#b71010",
+            icon: (
+              <MaterialCommunityIcons
+                name="pokeball"
+                size={16}
+                color="#b71010"
+              />
+            ),
+          },
+          ...pokemonTypes,
+        ].map((type) => (
           <Pressable
             key={type.value}
             className="flex-row items-center gap-2 border border-gray-200 rounded-full px-4 py-2 mx-1"
             style={{
-              backgroundColor: BG_COLOR_BY_TYPE[type.value] + "50",
+              backgroundColor:
+                selectedType === type.value
+                  ? BG_COLOR_BY_TYPE[type.value] + "50"
+                  : "transparent",
               borderColor: BG_COLOR_BY_TYPE[type.value],
             }}
             onPress={() => {
