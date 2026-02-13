@@ -13,6 +13,11 @@ module.exports = {
     extend: {
       fontFamily: {
         poppins: ["PoppinsMedium"], // must match the name from useFonts
+        "poppins-light": ["PoppinsLight"],
+        "poppins-regular": ["PoppinsRegular"],
+        "poppins-medium": ["PoppinsMedium"],
+        "poppins-bold": ["PoppinsBold"],
+        "poppins-bolder": ["PoppinsBolder"],
       },
       colors: {
         border: "hsl(var(--border))",

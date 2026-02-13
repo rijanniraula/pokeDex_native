@@ -1,12 +1,12 @@
-import React from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React from "react";
 
 export const ENDPOINTS = {
   BASE_POKEAPI: "https://pokeapi.co/api/v2",
   GET_ALL_POKEMONS: "/pokemon?limit=100000",
 };
 
-export const BG_COLOR_BY_TYPE = {
+export const BG_COLOR_BY_TYPE: { [key: string]: string } = {
   all: "#9f9a9a",
   grass: "#6edcc4",
   fire: "#fc7a6c",

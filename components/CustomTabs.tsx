@@ -1,8 +1,8 @@
-import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // adjust path
-import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { cn } from "@/lib/utils";
+import React from "react";
+import { View } from "react-native";
 
 export interface TabItem {
   key: string;
@@ -53,8 +53,8 @@ const CustomTabs: React.FC<CustomTabsProps> = ({
               style={{
                 fontSize: 18,
                 color: tab.key === value ? "black" : "gray",
-                fontWeight: 700,
               }}
+              className="font-poppins-medium"
             >
               {tab.title}
             </Text>
