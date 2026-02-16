@@ -18,6 +18,11 @@ module.exports = {
         "poppins-medium": ["PoppinsMedium"],
         "poppins-bold": ["PoppinsBold"],
         "poppins-bolder": ["PoppinsBolder"],
+        "space-grotesk": ["SpaceGrotesk"],
+        "space-grotesk-bold": ["SpaceGroteskBold"],
+        "space-grotesk-medium": ["SpaceGroteskMedium"],
+        "space-grotesk-light": ["SpaceGroteskLight"],
+        "space-grotesk-semi-bold": ["SpaceGroteskSemiBold"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -40,6 +45,7 @@ module.exports = {
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
+          brown: "#4A3A3A",
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",

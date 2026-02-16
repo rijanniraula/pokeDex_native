@@ -19,6 +19,11 @@ export default function Layout() {
     PoppinsMedium: require("../assets/fonts/Poppins-Medium.ttf"),
     PoppinsBold: require("../assets/fonts/Poppins-Bold.ttf"),
     PoppinsBolder: require("../assets/fonts/Poppins-ExtraBold.ttf"),
+    SpaceGrotesk: require("../assets/fonts/SpaceGrotesk-Regular.ttf"),
+    SpaceGroteskBold: require("../assets/fonts/SpaceGrotesk-Bold.ttf"),
+    SpaceGroteskMedium: require("../assets/fonts/SpaceGrotesk-Medium.ttf"),
+    SpaceGroteskLight: require("../assets/fonts/SpaceGrotesk-Light.ttf"),
+    SpaceGroteskSemiBold: require("../assets/fonts/SpaceGrotesk-SemiBold.ttf"),
   });
 
   useEffect(() => {
