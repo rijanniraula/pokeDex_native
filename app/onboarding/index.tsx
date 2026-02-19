@@ -46,7 +46,7 @@ export default function OnBoarding() {
             className="rounded-2xl h-16 w-full"
             onPress={() => router.push("/onboarding/legalDescription")}
           >
-            <Text className="text-xl font-bold">Get Started</Text>
+            <Text className="text-xl font-bold">Next</Text>
           </Button>
         </View>
       </View>

@@ -129,7 +129,7 @@ const LegalDescription = ({
         <Button
           variant={"destructive"}
           className="rounded-2xl h-16 w-full"
-          onPress={() => setOnBoardingSteps(2)}
+          onPress={() => router.push("/onboarding/dataFetchingLoader")}
         >
           <Text className="text-xl font-bold">Get Started</Text>
         </Button>
