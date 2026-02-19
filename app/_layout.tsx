@@ -1,6 +1,5 @@
 // app/_layout.tsx
 import { initDb } from "@/lib/db";
-import { seedPokemonIfNeeded } from "@/lib/seedPokemon";
 import { PortalHost } from "@rn-primitives/portal";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -28,7 +27,6 @@ export default function Layout() {
 
   useEffect(() => {
     initDb();
-    seedPokemonIfNeeded();
   }, []);
 
   useEffect(() => {

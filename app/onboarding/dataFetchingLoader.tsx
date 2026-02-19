@@ -4,7 +4,9 @@ import {
   POKEMON_LOADING_FACTS,
   POKEMON_LOADING_MESSAGES,
 } from "@/lib/pokemonFacts";
+import { seedPokemonIfNeeded } from "@/lib/seedPokemon";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, View } from "react-native";
 
@@ -12,8 +14,9 @@ const DataFetchingLoader = () => {
   const [fact, setFact] = useState("");
   const [loadingMessage, setLoadingMessage] = useState("");
 
+  // Rotate facts & messages every 5 seconds while loading
   useEffect(() => {
-    const interval = setInterval(() => {
+    const updateContent = () => {
       setLoadingMessage(
         POKEMON_LOADING_MESSAGES[
           Math.floor(Math.random() * POKEMON_LOADING_MESSAGES.length)
@@ -24,9 +27,24 @@ const DataFetchingLoader = () => {
           Math.floor(Math.random() * POKEMON_LOADING_FACTS.length)
         ]
       );
-    }, 5000);
+    };
+
+    updateContent();
+    const interval = setInterval(updateContent, 5000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // seed pokemon in background
+  useEffect(() => {
+    seedPokemonIfNeeded()
+      .then(() => {
+        router.replace("/pokedex");
+      })
+      .catch((err) => {
+        console.error("Seeding failed:", err);
+        router.replace("/pokedex");
+      });
   }, []);
 
   return (
@@ -44,10 +62,6 @@ const DataFetchingLoader = () => {
             style={{ width: 300, height: 300 }}
             className="rounded-2xl mx-auto"
           />
-          {/* <View
-                className="absolute  w-full bg-red-200"
-                style={{ height: 500, width: 500 }}
-              /> */}
         </View>
 
         <View className="flex items-center gap-4">
