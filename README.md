@@ -1,50 +1,61 @@
-# Welcome to your Expo app 👋
+# PokeLite
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+PokeLite is a React Native Pokedex app built with Expo and Expo Router.
+It provides a fast, clean UI for browsing Pokemon, filtering by type, and
+opening detailed profiles with stats, evolution data, and moves.
 
-## Get started
+## Features
 
-1. Install dependencies
+- Onboarding flow with first-run data setup
+- Local-first Pokemon listing with search and type filters
+- Pokemon detail screen with:
+  - About section (flavor text, height, weight, capture rate, habitat)
+  - Base stats with progress bars and radar chart
+  - Evolution chain cards
+  - Move set list with power, accuracy, and PP
+- Type-based colors and icon-driven UI
 
-   ```bash
-   npm install
-   ```
+## Tech Stack
 
-2. Start the app
+- Expo + React Native + TypeScript
+- Expo Router for file-based navigation
+- NativeWind (Tailwind-style utility classes)
+- Expo SQLite for local data storage
+- AsyncStorage for onboarding/seed state
+- PokeAPI as the upstream data source
 
-   ```bash
-   npx expo start
-   ```
+## Project Setup
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### 1) Install dependencies
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2) Start development server
 
-## Learn more
+```bash
+npm run start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+From the Expo CLI menu, open on Android, iOS, web, or Expo Go.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Available Scripts
 
-## Join the community
+- `npm run start` - Start Expo dev server
+- `npm run android` - Launch on Android
+- `npm run ios` - Launch on iOS
+- `npm run web` - Launch on web
+- `npm run lint` - Run lint checks
 
-Join our community of developers creating universal apps.
+## App Flow
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. `app/index.tsx` checks whether Pokemon data has been seeded.
+2. New users are routed to onboarding.
+3. The loader seeds Pokemon data and then routes to `/pokedex`.
+4. Returning users go directly to the Pokedex screen.
+
+## Notes
+
+- First launch may take longer because initial data is seeded.
+- Network is required to fetch live Pokemon details/evolution/move metadata.
